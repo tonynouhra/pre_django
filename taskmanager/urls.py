@@ -23,4 +23,5 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/admin/', permanent=False), name='index'),  # Redirect root to admin
     path("admin/", admin.site.urls),
     path('api/', include('tasks.urls')),
+    path('api/auth/', include('authentication.urls')),
 ]
