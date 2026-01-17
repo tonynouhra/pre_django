@@ -1,5 +1,6 @@
 amqp==5.3.1
 asgiref==3.11.0
+astroid==4.0.3
 asttokens==3.0.1
 attrs==25.4.0
 billiard==4.2.4
@@ -9,13 +10,18 @@ click==8.3.1
 click-didyoumean==0.3.1
 click-plugins==1.1.1.2
 click-repl==0.3.0
+cron_descriptor==2.0.6
 decorator==5.2.1
+dill==0.4.0
 Django==5.2.10
+django-celery-beat==2.8.1
 django-cors-headers==4.9.0
 django-extensions==3.2.3
 django-filter==25.2
 django-stubs==5.2.8
 django-stubs-ext==5.2.8
+django-timezone-field==7.2.1
+django_celery_results==2.6.0
 djangorestframework==3.16.1
 djangorestframework-stubs==3.16.7
 djangorestframework_simplejwt==5.5.1
@@ -27,6 +33,7 @@ flake8==7.0.0
 inflection==0.5.1
 iniconfig==2.3.0
 ipython==8.20.0
+isort==7.0.0
 jedi==0.19.2
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
@@ -48,8 +55,10 @@ pycodestyle==2.11.1
 pyflakes==3.2.0
 Pygments==2.19.2
 PyJWT==2.10.1
+pylint==4.0.4
 pytest==7.4.4
 pytest-django==4.7.0
+python-crontab==3.3.0
 python-dateutil==2.8.2
 python-decouple==3.8
 PyYAML==6.0.3
@@ -59,6 +68,7 @@ rpds-py==0.30.0
 six==1.17.0
 sqlparse==0.5.5
 stack-data==0.6.3
+tomlkit==0.14.0
 traitlets==5.14.3
 types-PyYAML==6.0.12.20250915
 types-requests==2.32.4.20260107
