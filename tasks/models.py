@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from taskmanager import settings
@@ -28,6 +29,14 @@ class Epic(models.Model):
         related_name='epics',
         help_text="User who created this epic"
     )
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reported_epics',
+        help_text="User who reported this epic"
+    )
     start_date = models.DateField(null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -54,6 +63,13 @@ class Epic(models.Model):
             return 0
         done = self.user_stories.filter(status='DONE').count()
         return round((done / total) * 100, 2)
+
+    # def clean(self):
+    #     """Validate that owner and reporter are different"""
+    #     if self.owner and self.reporter and self.owner == self.reporter:
+    #         raise ValidationError({
+    #             'reporter': 'Reporter cannot be the same as the owner.'
+    #         })
 
 
 class UserStory(models.Model):
@@ -103,6 +119,14 @@ class UserStory(models.Model):
         related_name='assigned_stories',
         help_text="User assigned to this story"
     )
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reported_stories',
+        help_text="User who reported this story"
+    )
 
     # Estimation (story points)
     story_points = models.IntegerField(
@@ -145,6 +169,13 @@ class UserStory(models.Model):
         if self.as_a and self.i_want and self.so_that:
             return f"As a {self.as_a}, I want {self.i_want}, so that {self.so_that}"
         return self.description
+
+    def clean(self):
+        """Validate that assigned_to and reporter are different"""
+        if self.assigned_to and self.reporter and self.assigned_to == self.reporter:
+            raise ValidationError({
+                'reporter': 'Reporter cannot be the same as the assigned user.'
+            })
 
 
 class Task(models.Model):
@@ -189,6 +220,14 @@ class Task(models.Model):
         related_name='assigned_tasks',
         help_text="User assigned to this task"
     )
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reported_tasks',
+        help_text="User who reported this task"
+    )
 
     # Estimation (hours)
     estimated_hours = models.DecimalField(
@@ -228,3 +267,10 @@ class Task(models.Model):
         if self.due_date and self.status != 'DONE':
             return timezone.now() > self.due_date
         return False
+
+    def clean(self):
+        """Validate that assigned_to and reporter are different"""
+        if self.assigned_to and self.reporter and self.assigned_to == self.reporter:
+            raise ValidationError({
+                'reporter': 'Reporter cannot be the same as the assigned user.'
+            })

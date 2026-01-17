@@ -57,6 +57,13 @@ class EpicViewSet(viewsets.ModelViewSet):
         serializer = UserStoryListSerializer(user_stories, many=True)
         return Response(serializer.data)
 
+    def perform_create(self, serializer):
+        """Auto-set reporter to current user if not provided"""
+        if 'reporter' not in serializer.validated_data or serializer.validated_data['reporter'] is None:
+            serializer.save(reporter=self.request.user)
+        else:
+            serializer.save()
+
 
 class UserStoryViewSet(viewsets.ModelViewSet):
     """
@@ -90,6 +97,13 @@ class UserStoryViewSet(viewsets.ModelViewSet):
         tasks = user_story.tasks.all()
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        """Auto-set reporter to current user if not provided"""
+        if 'reporter' not in serializer.validated_data or serializer.validated_data['reporter'] is None:
+            serializer.save(reporter=self.request.user)
+        else:
+            serializer.save()
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -217,6 +231,13 @@ class TaskViewSet(viewsets.ModelViewSet):
             },
             'completion_rate': round((done / total_tasks) * 100, 2)
         })
+
+    def perform_create(self, serializer):
+        """Auto-set reporter to current user if not provided"""
+        if 'reporter' not in serializer.validated_data or serializer.validated_data['reporter'] is None:
+            serializer.save(reporter=self.request.user)
+        else:
+            serializer.save()
 
 
 class GeneralStatisticsView(APIView):

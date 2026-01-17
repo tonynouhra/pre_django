@@ -19,6 +19,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     # Show assigned user details (read-only)
     assigned_to_detail = UserSerializer(source='assigned_to', read_only=True)
+    reporter_detail = UserSerializer(source='reporter', read_only=True)
 
     # Show computed properties
     is_overdue = serializers.ReadOnlyField()
@@ -34,6 +35,8 @@ class TaskSerializer(serializers.ModelSerializer):
             'user_story',
             'assigned_to',
             'assigned_to_detail',
+            'reporter',
+            'reporter_detail',  # Add this
             'estimated_hours',
             'actual_hours',
             'due_date',
@@ -44,6 +47,18 @@ class TaskSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'updated_at', 'is_overdue']
 
+    def validate(self, data):
+        """Validate that reporter and assigned_to are different"""
+        reporter = data.get('reporter')
+        assigned_to = data.get('assigned_to')
+
+        if reporter and assigned_to and reporter == assigned_to:
+            raise serializers.ValidationError({
+                'reporter': 'Reporter cannot be the same as the assigned user.'
+            })
+
+        return data
+
 
 class UserStorySerializer(serializers.ModelSerializer):
     """Serializer for UserStory model"""
@@ -53,6 +68,7 @@ class UserStorySerializer(serializers.ModelSerializer):
 
     # Show assigned user details
     assigned_to_detail = UserSerializer(source='assigned_to', read_only=True)
+    reporter_detail = UserSerializer(source='reporter', read_only=True)
 
     # Show computed properties
     tasks_count = serializers.ReadOnlyField()
@@ -74,6 +90,8 @@ class UserStorySerializer(serializers.ModelSerializer):
             'epic',
             'assigned_to',
             'assigned_to_detail',
+            'reporter',
+            'reporter_detail',
             'story_points',
             'start_date',
             'due_date',
@@ -85,6 +103,18 @@ class UserStorySerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'updated_at', 'tasks_count', 'completion_percentage', 'full_story']
 
+    def validate(self, data):
+        """Validate that reporter and assigned_to are different"""
+        reporter = data.get('reporter')
+        assigned_to = data.get('assigned_to')
+
+        if reporter and assigned_to and reporter == assigned_to:
+            raise serializers.ValidationError({
+                'reporter': 'Reporter cannot be the same as the assigned user.'
+            })
+
+        return data
+
 
 class EpicSerializer(serializers.ModelSerializer):
     """Serializer for Epic model"""
@@ -94,6 +124,8 @@ class EpicSerializer(serializers.ModelSerializer):
 
     # Show owner details
     owner_detail = UserSerializer(source='owner', read_only=True)
+
+    reporter_detail = UserSerializer(source='reporter', read_only=True)
 
     # Show computed properties
     user_stories_count = serializers.ReadOnlyField()
@@ -109,6 +141,8 @@ class EpicSerializer(serializers.ModelSerializer):
             'priority',
             'owner',
             'owner_detail',
+            'reporter',
+            'reporter_detail',
             'start_date',
             'due_date',
             'user_stories',
@@ -119,9 +153,20 @@ class EpicSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'updated_at', 'user_stories_count', 'completion_percentage']
 
-        # Simplified serializers (without nested data) for list views
+    # def validate(self, data):
+    #     """Validate that reporter and owner are different"""
+    #     reporter = data.get('reporter')
+    #     owner = data.get('owner')
+    #
+    #     if reporter and owner and reporter == owner:
+    #         raise serializers.ValidationError({
+    #             'reporter': 'Reporter cannot be the same as the owner.'
+    #         })
+    #
+    #     return data
 
 
+# Simplified serializers (without nested data) for list views
 class EpicListSerializer(serializers.ModelSerializer):
     """Simplified Epic serializer for list view"""
 

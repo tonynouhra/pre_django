@@ -11,18 +11,19 @@ class EpicAdmin(admin.ModelAdmin):
         'status',
         'priority',
         'owner',
+        'reporter',
         'user_stories_count',
         'completion_percentage',
         'due_date',
         'created_at'
     ]
 
-    list_filter = ['status', 'priority', 'created_at', 'owner']
+    list_filter = ['status', 'priority', 'created_at', 'owner','reporter', ]
     search_fields = ['title', 'description']
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('title', 'description', 'owner')
+            'fields': ('title', 'description', 'owner','reporter')
         }),
         ('Status & Priority', {
             'fields': ('status', 'priority')
@@ -55,13 +56,14 @@ class UserStoryAdmin(admin.ModelAdmin):
         'status',
         'priority',
         'assigned_to',
+        'reporter',
         'story_points',
         'tasks_count',
         'completion_percentage',
         'due_date'
     ]
 
-    list_filter = ['status', 'priority', 'epic', 'assigned_to', 'created_at']
+    list_filter = ['status', 'priority', 'epic', 'assigned_to', 'created_at','reporter', ]
     search_fields = ['title', 'description', 'as_a', 'i_want', 'so_that']
 
     fieldsets = (
@@ -73,7 +75,7 @@ class UserStoryAdmin(admin.ModelAdmin):
             'description': 'Agile format: As a [user], I want [goal], so that [benefit]'
         }),
         ('Status & Assignment', {
-            'fields': ('status', 'priority', 'assigned_to', 'story_points')
+            'fields': ('status', 'priority', 'assigned_to', 'reporter','story_points')
         }),
         ('Dates', {
             'fields': ('start_date', 'due_date')
@@ -103,6 +105,7 @@ class TaskAdmin(admin.ModelAdmin):
         'status',
         'priority',
         'assigned_to',
+        'reporter',
         'estimated_hours',
         'actual_hours',
         'is_overdue',
@@ -110,7 +113,7 @@ class TaskAdmin(admin.ModelAdmin):
         'created_at'
     ]
 
-    list_filter = ['status', 'priority', 'user_story__epic', 'assigned_to', 'created_at']
+    list_filter = ['status', 'priority', 'user_story__epic', 'assigned_to', 'created_at','reporter' ]
     search_fields = ['title', 'description', 'user_story__title']
 
     fieldsets = (
@@ -118,7 +121,7 @@ class TaskAdmin(admin.ModelAdmin):
             'fields': ('title', 'description', 'user_story')
         }),
         ('Status & Assignment', {
-            'fields': ('status', 'priority', 'assigned_to')
+            'fields': ('status', 'priority', 'assigned_to', 'reporter')
         }),
         ('Time Tracking', {
             'fields': ('estimated_hours', 'actual_hours')
