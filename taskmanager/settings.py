@@ -162,13 +162,22 @@ CELERY_TIMEZONE = 'UTC'
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
-# For production, use SMTP:
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+# Email Configuration
+# For testing/CI: uses console backend (prints emails to console)
+# For production: configure EMAIL_HOST_USER and EMAIL_HOST_PASSWORD in .env
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+
+if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
+    # Production: Use SMTP (Mailtrap or real SMTP server)
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+    EMAIL_PORT = 587
+    EMAIL_USE_TLS = True
+else:
+    # Development/Testing/CI: Print emails to console
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 DEFAULT_FROM_EMAIL = 'noreply@taskmanager.com'
 
 # for testing purpose
