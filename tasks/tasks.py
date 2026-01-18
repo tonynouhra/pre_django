@@ -2,6 +2,7 @@ from celery import shared_task
 from django.core.mail import send_mail
 from django.conf import settings
 from .models import Epic, UserStory, Task
+from django.utils import timezone
 
 
 @shared_task
@@ -75,3 +76,46 @@ def send_status_change_email(model_name, instance_id, old_status, new_status):
         return f"Email sent successfully to {', '.join(recipients)}"
     except Exception as e:
         return f"Failed to send email: {str(e)}"
+
+
+@shared_task
+def send_overdue_task_reminders():
+    """Send email reminders for overdue tasks"""
+    overdue_tasks = Task.objects.filter(due_date__lt=timezone.now(), status__in=['TODO', 'IN_PROGRESS'])
+
+    for task in overdue_tasks:
+        recipients = []
+
+        if task.assigned_to and task.assigned_to.email:
+            recipients.append(task.assigned_to.email)
+
+        if task.reporter and task.reporter.email:
+            recipients.append(task.reporter.email)
+
+        recipients = list(set(recipients))
+
+        if not recipients:
+            continue
+
+        subject = f"Overdue Task Reminder: {task.title}"
+        message = f"""Hello,The task "{task.title}" is overdue as of {task.due_date}.Please take the necessary actions to complete it.
+
+      Task Details:                                                                                                                                                                                                                
+      - Title: {task.title}                                                                                                                                                                                                        
+      - Due Date: {task.due_date}                                                                                                                                                                                                  
+      - Status: {task.status}                                                                                                                                                                                                       
+
+      Best regards,                                                                                                                                                                                                                
+      Task Manager System                                                                                                                                                                                                          
+      """
+
+        try:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=recipients,
+                fail_silently=False,
+            )
+        except Exception:
+            continue
